@@ -37,7 +37,7 @@ jobs:
             target: ""
             args: ""
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - if: runner.os == 'Linux'
         run: sudo apt-get update
       - if: runner.os == 'Linux'
