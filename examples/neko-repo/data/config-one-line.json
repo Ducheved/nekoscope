@@ -1,0 +1,6 @@
+{
+  "provider": "local",
+  "features": ["markdown", "mindmap", "sync"],
+  "nested": { "safe": true, "count": 3 },
+  "thresholds": { "openMs": 300, "coldStartMs": 1500 }
+}
