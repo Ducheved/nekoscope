@@ -1,5 +1,13 @@
-allowBuilds:
-  esbuild: true
+minimumReleaseAgeExclude:
+  - "@vitest/expect@4.1.9"
+  - "@vitest/mocker@4.1.9"
+  - "@vitest/pretty-format@4.1.9"
+  - "@vitest/runner@4.1.9"
+  - "@vitest/snapshot@4.1.9"
+  - "@vitest/spy@4.1.9"
+  - "@vitest/utils@4.1.9"
+  - prettier-plugin-svelte@4.1.1
+  - vitest@4.1.9
 
 overrides:
   cookie: ^0.7.0
