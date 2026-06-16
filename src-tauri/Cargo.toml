@@ -1,0 +1,36 @@
+[package]
+name = "nekoscope"
+version = "0.1.0"
+description = "A tiny kawaii knowledge lens for Markdown-heavy repos."
+authors = ["NekoScope contributors"]
+license = "MPL-2.0"
+edition = "2024"
+
+[lib]
+name = "nekoscope_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-deep-link = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-shell = "2"
+dirs = "6"
+ignore = "0.4"
+notify = "8"
+opener = { version = "0.7", features = ["reveal"] }
+regex = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+thiserror = "2"
+toml = "0.8"
+url = "2"
+walkdir = "2"
+
+[dev-dependencies]
+tempfile = "3"

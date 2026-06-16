@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 760" role="img" aria-label="NekoScope sample interface">
+  <rect width="1280" height="760" fill="#f7eef3"/>
+  <rect x="22" y="22" width="1236" height="64" rx="8" fill="rgba(255,255,255,.72)" stroke="rgba(74,85,104,.22)"/>
+  <rect x="22" y="104" width="260" height="610" rx="8" fill="rgba(255,255,255,.68)" stroke="rgba(74,85,104,.22)"/>
+  <rect x="300" y="104" width="620" height="610" rx="8" fill="rgba(255,255,255,.68)" stroke="rgba(74,85,104,.22)"/>
+  <rect x="938" y="104" width="320" height="610" rx="8" fill="rgba(255,255,255,.68)" stroke="rgba(74,85,104,.22)"/>
+  <text x="58" y="62" font-family="Segoe UI, sans-serif" font-size="24" fill="#182026">NekoScope</text>
+  <text x="330" y="154" font-family="Segoe UI, sans-serif" font-size="34" fill="#182026">NekoScope Sample</text>
+  <text x="330" y="200" font-family="Segoe UI, sans-serif" font-size="18" fill="#687383">Markdown, diagrams, DevOps and ML metadata in one glass workspace.</text>
+  <rect x="50" y="140" width="200" height="34" rx="8" fill="#fff"/>
+  <rect x="50" y="188" width="180" height="34" rx="8" fill="#fff"/>
+  <rect x="50" y="236" width="210" height="34" rx="8" fill="#fff"/>
+  <rect x="968" y="144" width="236" height="34" rx="8" fill="#fff"/>
+  <rect x="1008" y="212" width="150" height="32" rx="8" fill="#fff"/>
+  <rect x="1038" y="266" width="150" height="32" rx="8" fill="#fff"/>
+  <rect x="1068" y="320" width="150" height="32" rx="8" fill="#fff"/>
+  <path d="M975 228h33M975 282h63M975 336h93" stroke="#f08a4b" stroke-width="4" stroke-linecap="round"/>
+</svg>
