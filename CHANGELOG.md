@@ -2,8 +2,20 @@
 
 ## 0.1.0
 
-- Added Tauri 2, Rust 2024 and Svelte foundation.
-- Added glass workspace shell, file explorer, tabs, Markdown rendering, source view and split view.
-- Added English, Russian, Japanese and Chinese base localization.
-- Added mindmap, diagram, DevOps, ML, comments, AI provider and sync profile panels.
-- Added sample workspace, tests, CI/CD, release workflow and publication scripts.
+- Tauri 2 + SvelteKit foundation for a fast, calm desktop Markdown viewer.
+- Open a `.md` file straight from the desktop: file association, "Open with",
+  drag-and-drop and command-line argument all open the file immediately. A
+  single-instance guard focuses the running window for subsequent files.
+- Markdown rendering: GitHub-Flavored Markdown, frontmatter, KaTeX math, inline
+  Mermaid diagrams themed for light and dark, syntax-highlighted code fences with
+  copy buttons.
+- Navigation: file sidebar, document outline, quick switcher, command palette,
+  full-text folder search with jump-to-line, and in-place relative-link
+  navigation.
+- Reading comfort: rendered / source / split views, Zen mode, light / dark /
+  system theme, adjustable font size, and live reload when a file changes on
+  disk.
+- Localization in English, Russian, Japanese and Chinese, selected from the
+  system locale by default.
+- Read-only and offline: path validation, sanitized HTML, no network calls, no
+  telemetry.

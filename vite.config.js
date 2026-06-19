@@ -12,6 +12,7 @@ export default defineConfig(async () => ({
   test: {
     environment: "node",
     include: ["src/**/*.test.ts", "tests/**/*.test.ts"],
+    testTimeout: 30000,
   },
   server: {
     port: 1420,

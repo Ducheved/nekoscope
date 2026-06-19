@@ -1,23 +1,21 @@
 import { writable } from "svelte/store";
-import { defaultProviderProfile } from "./providerProfiles";
-import type { AppSettings } from "./types";
+import type { AppSettings, LocaleCode } from "./types";
 
 const storageKey = "nekoscope-settings";
+
+function detectLocale(): LocaleCode {
+  if (typeof navigator === "undefined") return "en";
+  const lang = navigator.language?.toLowerCase() ?? "en";
+  if (lang.startsWith("ru")) return "ru";
+  if (lang.startsWith("ja")) return "ja";
+  if (lang.startsWith("zh")) return "zh";
+  return "en";
+}
 
 export const defaultSettings: AppSettings = {
   locale: "en",
   theme: "system",
   fontScale: 1,
-  diagramScale: 1,
-  providerProfile: defaultProviderProfile,
-  syncProfiles: [],
-  includeCurrentFile: true,
-  includeSelectedText: true,
-  includeRenderedOutline: true,
-  includeFolderIndex: false,
-  includeComments: true,
-  secretRedaction: true,
-  trustedHtmlWorkspaces: [],
 };
 
 export const settingsStore = writable<AppSettings>(loadSettings());
@@ -30,14 +28,15 @@ settingsStore.subscribe((value) => {
 });
 
 export function loadSettings(): AppSettings {
+  const base: AppSettings = { ...defaultSettings, locale: detectLocale() };
   const storage = browserStorage();
-  if (!storage) return defaultSettings;
+  if (!storage) return base;
   const raw = storage.getItem(storageKey);
-  if (!raw) return defaultSettings;
+  if (!raw) return base;
   try {
-    return { ...defaultSettings, ...JSON.parse(raw) };
+    return { ...base, ...(JSON.parse(raw) as Partial<AppSettings>) };
   } catch {
-    return defaultSettings;
+    return base;
   }
 }
 

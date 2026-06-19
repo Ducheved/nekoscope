@@ -1,10 +1,3 @@
-import {
-  applyEdits,
-  format as formatJsoncEdits,
-  parse as parseJsonc,
-} from "jsonc-parser";
-import * as toml from "smol-toml";
-import YAML from "yaml";
 import type { DocumentKind } from "./types";
 
 export function detectDocumentKind(path: string, content = ""): DocumentKind {
@@ -31,41 +24,73 @@ export function detectDocumentKind(path: string, content = ""): DocumentKind {
   if (lower.endsWith(".ipynb")) return "notebook";
   if (lower.endsWith(".mm")) return "mindmap";
   if (lower.endsWith(".opml")) return "opml";
+  if (isBinaryExtension(lower)) return "binary";
   return "text";
 }
 
-export function isOneLineJson(content: string) {
-  const trimmed = content.trim();
-  if (trimmed.length <= 160 || trimmed.includes("\n")) return false;
-  try {
-    JSON.parse(trimmed);
-    return true;
-  } catch {
-    return false;
-  }
-}
+const binaryExtensions = [
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".gif",
+  ".bmp",
+  ".ico",
+  ".webp",
+  ".tif",
+  ".tiff",
+  ".avif",
+  ".pdf",
+  ".zip",
+  ".gz",
+  ".tgz",
+  ".tar",
+  ".7z",
+  ".rar",
+  ".bz2",
+  ".xz",
+  ".zst",
+  ".mp3",
+  ".mp4",
+  ".mov",
+  ".avi",
+  ".mkv",
+  ".webm",
+  ".wav",
+  ".flac",
+  ".ogg",
+  ".m4a",
+  ".woff",
+  ".woff2",
+  ".ttf",
+  ".otf",
+  ".eot",
+  ".exe",
+  ".dll",
+  ".so",
+  ".dylib",
+  ".bin",
+  ".class",
+  ".jar",
+  ".wasm",
+  ".node",
+  ".pdb",
+  ".doc",
+  ".docx",
+  ".xls",
+  ".xlsx",
+  ".ppt",
+  ".pptx",
+  ".odt",
+  ".ods",
+  ".odp",
+  ".db",
+  ".sqlite",
+  ".sqlite3",
+  ".pyc",
+];
 
-export function formatDocument(path: string, content: string) {
-  const kind = detectDocumentKind(path, content);
-  if (kind === "json")
-    return `${JSON.stringify(JSON.parse(content), null, 2)}\n`;
-  if (kind === "jsonc") return formatJsonc(content);
-  if (kind === "yaml") return YAML.stringify(YAML.parse(content));
-  if (kind === "toml") return `${toml.stringify(toml.parse(content))}\n`;
-  if (kind === "markdown" || kind === "text") return `${content.trimEnd()}\n`;
-  throw new Error("Unsupported document format");
-}
-
-export function formatJsonc(content: string) {
-  parseJsonc(content);
-  return applyEdits(
-    content,
-    formatJsoncEdits(content, undefined, {
-      insertSpaces: true,
-      tabSize: 2,
-      eol: "\n",
-    }),
-  );
+function isBinaryExtension(lower: string) {
+  return binaryExtensions.some((ext) => lower.endsWith(ext));
 }
 
 function looksLikeJson(content: string) {

@@ -1,43 +1,16 @@
 import type { CommandAction } from "./types";
 
 export const commandActions: CommandAction[] = [
-  {
-    id: "open-folder",
-    label: "Open Folder",
-    shortcut: "Ctrl/Cmd+Shift+O",
-    panel: "workspace",
-  },
-  {
-    id: "open-file",
-    label: "Open File",
-    shortcut: "Ctrl/Cmd+O",
-    panel: "workspace",
-  },
-  {
-    id: "quick-switcher",
-    label: "Quick Switcher",
-    shortcut: "Ctrl/Cmd+P",
-    panel: "quick",
-  },
-  { id: "search", label: "Search", shortcut: "Ctrl/Cmd+F", panel: "search" },
-  {
-    id: "mindmap",
-    label: "Mindmap",
-    shortcut: "Ctrl/Cmd+Shift+M",
-    panel: "mindmap",
-  },
-  { id: "ask-ai", label: "Ask AI", shortcut: "Ctrl/Cmd+Enter", panel: "ai" },
-  {
-    id: "open-ide",
-    label: "Open in IDE",
-    shortcut: "Ctrl/Cmd+Shift+I",
-    panel: "ide",
-  },
+  { id: "open-folder", shortcut: "Ctrl/Cmd+Shift+O" },
+  { id: "open-file", shortcut: "Ctrl/Cmd+O" },
+  { id: "quick-switcher", shortcut: "Ctrl/Cmd+P" },
+  { id: "search", shortcut: "Ctrl/Cmd+F" },
+  { id: "toggle-view", shortcut: "Ctrl/Cmd+E" },
+  { id: "toggle-outline", shortcut: "Ctrl/Cmd+I" },
+  { id: "toggle-sidebar", shortcut: "Ctrl/Cmd+B" },
+  { id: "toggle-theme", shortcut: "Ctrl/Cmd+J" },
+  { id: "zen", shortcut: "Ctrl/Cmd+Shift+Z" },
+  { id: "open-external", shortcut: "Ctrl/Cmd+Shift+E" },
+  { id: "reveal", shortcut: "Ctrl/Cmd+Shift+R" },
+  { id: "settings", shortcut: "Ctrl/Cmd+," },
 ];
-
-export function filterCommands(query: string) {
-  const needle = query.trim().toLowerCase();
-  return commandActions.filter((command) =>
-    command.label.toLowerCase().includes(needle),
-  );
-}

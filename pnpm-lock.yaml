@@ -20,15 +20,9 @@ importers:
       '@tauri-apps/plugin-dialog':
         specifier: ^2
         version: 2.7.1
-      '@tauri-apps/plugin-opener':
-        specifier: ^2
-        version: 2.5.4
-      '@tauri-apps/plugin-shell':
-        specifier: ^2
-        version: 2.3.5
-      jsonc-parser:
-        specifier: ^3.3.1
-        version: 3.3.1
+      katex:
+        specifier: ^0.16.22
+        version: 0.16.47
       mermaid:
         specifier: ^11.4.1
         version: 11.15.0
@@ -56,18 +50,9 @@ importers:
       remark-rehype:
         specifier: ^11.1.1
         version: 11.1.2
-      smol-toml:
-        specifier: ^1.3.4
-        version: 1.6.1
       unified:
         specifier: ^11.0.5
         version: 11.0.5
-      unist-util-visit:
-        specifier: ^5.0.0
-        version: 5.1.0
-      yaml:
-        specifier: ^2.6.1
-        version: 2.9.0
     devDependencies:
       '@sveltejs/adapter-static':
         specifier: ^3.0.10
@@ -418,12 +403,6 @@ packages:
 
   '@tauri-apps/plugin-dialog@2.7.1':
     resolution: {integrity: sha512-OK1UBXYt+ojcmxMktzzuyonYIFta8CmAASpX+CA+DTGK24KlHjhYI6x2iOJ/TjZF4N7/ACK1oFmEOjIY9IhzOQ==}
-
-  '@tauri-apps/plugin-opener@2.5.4':
-    resolution: {integrity: sha512-1HnPkb+AmgO29HBazm4uPLKB+r7zzcTBW1d0fyYp1uP+jwtpoiNDGKMMzz58SFp49nOIrxdE3aUJtT57lfO9CQ==}
-
-  '@tauri-apps/plugin-shell@2.3.5':
-    resolution: {integrity: sha512-jewtULhiQ7lI7+owCKAjc8tYLJr92U16bPOeAa472LHJdgaibLP83NcfAF2e+wkEcA53FxKQAZ7byDzs2eeizg==}
 
   '@tybys/wasm-util@0.10.2':
     resolution: {integrity: sha512-RoBvJ2X0wuKlWFIjrwffGw1IqZHKQqzIchKaadZZfnNpsAYp2mM0h36JtPCjNDAHGgYez/15uMBpfGwchhiMgg==}
@@ -1079,9 +1058,6 @@ packages:
       canvas:
         optional: true
 
-  jsonc-parser@3.3.1:
-    resolution: {integrity: sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==}
-
   katex@0.16.47:
     resolution: {integrity: sha512-Eeo8Ys1doU1z+x8AZsPpQu+p/QcZBI5PeOo7QGQdy2x2m0MU/hYagBbGOmXwr5KVbEfVuWv9LpnQWeehogurjg==}
     hasBin: true
@@ -1485,10 +1461,6 @@ packages:
   sirv@3.0.2:
     resolution: {integrity: sha512-2wcC/oGxHis/BoHkkPwldgiPSYcpZK3JU28WoMVv55yHJgcZ8rlXvuG9iZggz+sU1d4bRgIGASwyWqjxu3FM0g==}
     engines: {node: '>=18'}
-
-  smol-toml@1.6.1:
-    resolution: {integrity: sha512-dWUG8F5sIIARXih1DTaQAX4SsiTXhInKf1buxdY9DIg4ZYPZK5nGM1VRIYmEbDbsHt7USo99xSLFu5Q1IqTmsg==}
-    engines: {node: '>= 18'}
 
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -2016,14 +1988,6 @@ snapshots:
       '@tauri-apps/cli-win32-x64-msvc': 2.11.2
 
   '@tauri-apps/plugin-dialog@2.7.1':
-    dependencies:
-      '@tauri-apps/api': 2.11.0
-
-  '@tauri-apps/plugin-opener@2.5.4':
-    dependencies:
-      '@tauri-apps/api': 2.11.0
-
-  '@tauri-apps/plugin-shell@2.3.5':
     dependencies:
       '@tauri-apps/api': 2.11.0
 
@@ -2789,8 +2753,6 @@ snapshots:
       - utf-8-validate
     optional: true
 
-  jsonc-parser@3.3.1: {}
-
   katex@0.16.47:
     dependencies:
       commander: 8.3.0
@@ -3435,8 +3397,6 @@ snapshots:
       mrmime: 2.0.1
       totalist: 3.0.1
 
-  smol-toml@1.6.1: {}
-
   source-map-js@1.2.1: {}
 
   space-separated-tokens@2.0.2: {}
@@ -3675,7 +3635,8 @@ snapshots:
   xmlchars@2.2.0:
     optional: true
 
-  yaml@2.9.0: {}
+  yaml@2.9.0:
+    optional: true
 
   zimmerframe@1.1.4: {}
 

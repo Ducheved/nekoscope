@@ -1,14 +1,8 @@
-pub mod ai;
-pub mod comments;
-pub mod devops;
 pub mod errors;
+pub mod external;
 pub mod file_tree;
 pub mod formatters;
-pub mod ide;
-pub mod link_graph;
-pub mod ml;
 pub mod models;
 pub mod os_hooks;
 pub mod security;
-pub mod settings;
 pub mod watcher;

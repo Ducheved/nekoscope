@@ -1,27 +1,32 @@
 # Security Model
 
-NekoScope is designed for local-first repository inspection.
+NekoScope is a local-first, read-only Markdown viewer.
 
-## File Access Scope
+## File access scope
 
-All Rust filesystem commands canonicalize the selected workspace and reject paths that escape it. Symlinks outside the workspace are rejected by canonical path checks unless a future workspace policy explicitly allows them.
+All Rust filesystem commands canonicalize the open folder and reject paths that
+escape it. When a single file is opened, its parent folder becomes the scope.
+Symlinks that resolve outside the folder are rejected by the canonical-path
+check.
 
-## Markdown Sanitization
+## Read-only
 
-Markdown is rendered through a unified pipeline with sanitized HTML output. Rendered documents do not execute code blocks or diagram content.
+The app reads files; it has no command that writes to the documents it displays.
+The only outward actions are opening a file with the OS default handler and
+revealing it in the file manager.
 
-## AI Redaction
+## Markdown sanitization
 
-Secret-looking values are redacted from prompts and context files before request previews are created. `.env`, password, token, API key and private-key patterns are treated as sensitive by default.
+Markdown is rendered through a `unified` pipeline with `rehype-sanitize`, so
+rendered documents cannot inject scripts or unsafe HTML. Code fences and Mermaid
+diagrams are rendered as text/SVG and never executed as code.
 
-## Shell Restrictions
+## Network
 
-IDE escalation supports system default opening and allowlisted editor commands. Custom command templates are rejected unless they resolve to an allowlisted executable.
-
-## Secrets Storage
-
-Provider profile persistence does not write plaintext API keys. Stored profiles keep a secret-present marker while the user supplies secret material in the desktop session.
+The app makes no network requests. The Content-Security-Policy restricts
+`connect-src`, `script-src` and `img-src` to local sources, and there is no
+remote document fetching.
 
 ## Telemetry
 
-No telemetry, analytics or crash upload is configured. Logs remain local and must not include secrets.
+No telemetry, analytics or crash upload is configured.

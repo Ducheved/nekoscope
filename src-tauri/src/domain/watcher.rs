@@ -43,11 +43,13 @@ pub fn register_workspace(
     watcher
         .watch(root.as_path(), RecursiveMode::Recursive)
         .map_err(|error| NekoError::Watcher(error.to_string()))?;
-    registry
+    let mut watchers = registry
         .watchers
         .lock()
-        .map_err(|error| NekoError::Watcher(error.to_string()))?
-        .insert(key.clone(), watcher);
+        .map_err(|error| NekoError::Watcher(error.to_string()))?;
+    watchers.clear();
+    watchers.insert(key.clone(), watcher);
+    drop(watchers);
     Ok(WatchReceipt {
         path: key,
         recursive: true,

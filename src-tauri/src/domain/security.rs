@@ -29,25 +29,6 @@ pub fn resolve_existing_in_workspace(workspace: &str, path: &str) -> NekoResult<
     }
 }
 
-pub fn resolve_writable_in_workspace(workspace: &str, path: &str) -> NekoResult<PathBuf> {
-    let root = normalize_workspace(workspace)?;
-    let candidate = if Path::new(path).is_absolute() {
-        PathBuf::from(path)
-    } else {
-        root.join(path)
-    };
-    let parent = candidate
-        .parent()
-        .map(Path::to_path_buf)
-        .unwrap_or_else(|| root.clone());
-    let canonical_parent = fs::canonicalize(parent)?;
-    if canonical_parent.starts_with(&root) {
-        Ok(candidate)
-    } else {
-        Err(NekoError::PathEscapesWorkspace(candidate))
-    }
-}
-
 pub fn relative_path(root: &Path, path: &Path) -> String {
     path.strip_prefix(root)
         .unwrap_or(path)

@@ -2,31 +2,48 @@
 
 [![CI](https://github.com/nekoscope/nekoscope/actions/workflows/ci.yml/badge.svg)](https://github.com/nekoscope/nekoscope/actions/workflows/ci.yml)
 
-A tiny kawaii knowledge lens for Markdown-heavy repos.
+A fast, calm desktop **Markdown viewer**.
 
-NekoScope is a cross-platform Tauri 2 desktop app for engineers who need to open a folder, move quickly through Markdown-heavy documentation, render diagrams, inspect DevOps and ML metadata, add sidecar review comments and prepare redacted AI context without handing the whole repository to a network service by accident.
+Double-click a `.md` file and NekoScope opens it instantly — rendered, with an
+outline and the rest of the folder one click away. It is a lightweight Tauri 2
+desktop app: no accounts, no network calls, no telemetry.
 
 ![NekoScope sample screenshot](assets/screenshots/nekoscope-sample.svg)
 
 ## Features
 
-- Three-pane glass desktop shell with file explorer, document viewer and right-side outline, mindmap, diagram, metadata, comments or AI panel.
-- Base languages: English, Russian, Japanese and Chinese, with a small `registerLocale` API for adding more.
-- Markdown rendering with GFM, frontmatter, math, sanitized HTML, outline extraction, wikilinks and local link graph utilities.
-- Diagram workbench with Markdown outline mindmaps, Mermaid mindmap parsing, JSON/YAML/OPML/FreeMind tree adapters, zoom, fit, copy source and SVG export.
-- DevOps summaries for Kubernetes, GitHub Actions, Docker Compose and Terraform.
-- ML summaries for model cards, metrics JSON and notebooks.
-- JSON one-line auto-pretty preview plus explicit Save Formatted flow.
-- Sidecar comments stored under `.nekoscope/comments.json` by workspace.
-- AI provider profiles for OpenAI-compatible, Anthropic-compatible, Ollama and generic HTTP profiles with redaction and no plaintext API-key persistence.
-- Sync profiles for cloud-mounted folders, local folders and network shares.
-- IDE escalation through system default, VS Code, Cursor, Sublime Text, Zed or an allowlisted custom command.
+- **Open from the desktop.** Double-click, "Open with", drag-and-drop onto the
+  window, or pass a path on the command line. A second double-click focuses the
+  window that is already open instead of starting a new one.
+- **Rich rendering.** GitHub-Flavored Markdown (tables, task lists,
+  strikethrough), frontmatter, KaTeX math, inline Mermaid diagrams (themed for
+  light and dark), syntax-highlighted code fences with copy buttons.
+- **Navigation.** File sidebar, document outline, quick switcher
+  (`Ctrl/Cmd+P`), command palette (`Ctrl/Cmd+K`), and full-text folder search
+  (`Ctrl/Cmd+F`) that jumps to the matching line.
+- **Reading comfort.** Rendered / Source / Split views, Zen mode, light / dark /
+  system theme, adjustable font size.
+- **Live reload.** Edit a file in your editor and the view refreshes itself.
+- **Stays out of the way.** Relative links between documents open in place; the
+  toolbar can open the file in your default editor or reveal it in the file
+  manager.
+- **Languages.** English, Russian, Japanese and Chinese, picked from your
+  system locale by default.
 
-## Install
+## Open `.md` from the desktop
 
-Release bundles are produced by `.github/workflows/release.yml` for macOS, Linux and Windows when a `nekoscope-v*` tag is pushed.
+The installer registers NekoScope as a handler for `.md`, `.markdown` and `.mdx`
+files. On Windows and Linux the opened file is delivered as a launch argument; on
+macOS it arrives through the system "open file" event. Either way the file is
+shown immediately and its folder is loaded into the sidebar so you can browse
+sibling documents.
 
-## Build From Source
+## Supported files
+
+Markdown is the focus. Any other text file you open from the sidebar (YAML, JSON,
+TOML, Dockerfile, Terraform, …) is shown in the syntax-highlighted source view.
+
+## Build from source
 
 ```sh
 pnpm install
@@ -36,34 +53,33 @@ pnpm tauri build
 
 The desktop binary does not require Node at runtime.
 
-## Supported Files
-
-Markdown, MDX, text, JSON, JSONC, YAML, TOML, INI, env files, XML, Terraform/HCL, Dockerfile, Docker Compose, GitHub Actions, GitLab CI, Helm values, Kubernetes manifests, MLflow/DVC metadata, notebooks, FreeMind and OPML are recognized by the current viewer and summary layers.
-
-## AI Provider Setup
-
-Open Settings, choose a provider type, set base URL, model, temperature and max tokens, then send a request from the Ask AI panel. Secrets are redacted from prompts and context previews, and API keys are represented as secret-present markers rather than plaintext application settings.
-
-## Privacy Model
-
-NekoScope validates file paths against the selected workspace, sanitizes rendered Markdown, disables remote document fetches by default, stores logs locally, avoids telemetry and redacts `.env`, token, password and private-key patterns before AI context is prepared.
-
 ## Keyboard
 
-The command palette and quick switcher expose the core workflow actions. Native shortcuts are wired in the app shell for opening folders, switching files, toggling mindmaps, opening AI context and escalating to an IDE.
+| Keys                       | Action                          |
+| -------------------------- | ------------------------------- |
+| `Ctrl/Cmd + O`             | Open file                       |
+| `Ctrl/Cmd + Shift + O`     | Open folder                     |
+| `Ctrl/Cmd + P`             | Quick switch file               |
+| `Ctrl/Cmd + F`             | Search in folder                |
+| `Ctrl/Cmd + K`             | Command palette                 |
+| `Ctrl/Cmd + E`             | Cycle rendered / source / split |
+| `Ctrl/Cmd + I`             | Toggle outline                  |
+| `Ctrl/Cmd + B`             | Toggle file sidebar             |
+| `Ctrl/Cmd + J`             | Toggle light / dark             |
+| `Ctrl/Cmd + =` / `-` / `0` | Font size up / down / reset     |
+| `Ctrl/Cmd + Shift + Z`     | Zen mode                        |
+| `Esc`                      | Close dialog / leave Zen mode   |
+
+## Privacy
+
+NekoScope validates file paths against the open folder, sanitizes rendered HTML,
+makes no network requests, stores nothing remotely and collects no telemetry.
 
 ## Verification
 
 ```sh
 pnpm verify
-cargo test --manifest-path src-tauri/Cargo.toml
-pnpm tauri build
 ```
 
-## Publication
-
-```sh
-bash scripts/publish-github.sh
-```
-
-If GitHub authentication is unavailable, set `GH_TOKEN` and rerun the same script.
+This runs the frontend checks (lint, format, typecheck, tests, build) and the
+Rust checks (`cargo fmt`, `cargo clippy`, `cargo test`).

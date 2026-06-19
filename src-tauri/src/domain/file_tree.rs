@@ -9,12 +9,56 @@ use tauri::{AppHandle, State};
 use walkdir::WalkDir;
 
 use crate::domain::{
-    errors::NekoResult,
+    errors::{NekoError, NekoResult},
     formatters::detect_document_kind,
-    models::{FilePayload, FileTreeEntry, SearchResult, WatchReceipt, WorkspaceSummary},
+    models::{
+        DocumentKind, FilePayload, FileTreeEntry, OpenResult, SearchResult, WatchReceipt,
+        WorkspaceSummary,
+    },
     security, watcher,
     watcher::WatcherRegistry,
 };
+
+pub fn open_path(path: &str) -> NekoResult<OpenResult> {
+    let canonical = fs::canonicalize(path)?;
+    if canonical.is_dir() {
+        let dir = canonical.to_string_lossy().to_string();
+        let workspace = open_workspace(&dir)?;
+        let entries = list_workspace_tree(&workspace.path, false)?;
+        let file = entries
+            .iter()
+            .filter(|entry| !entry.is_dir && entry.kind == DocumentKind::Markdown)
+            .find_map(|entry| read_workspace_file(&workspace.path, &entry.path).ok())
+            .or_else(|| {
+                entries
+                    .iter()
+                    .filter(|entry| !entry.is_dir && entry.kind != DocumentKind::Binary)
+                    .find_map(|entry| read_workspace_file(&workspace.path, &entry.path).ok())
+            });
+        let active_path = file.as_ref().map(|file| file.path.clone());
+        Ok(OpenResult {
+            workspace,
+            entries,
+            file,
+            active_path,
+        })
+    } else {
+        let parent = canonical
+            .parent()
+            .map(Path::to_path_buf)
+            .ok_or_else(|| NekoError::WorkspaceUnavailable(canonical.clone()))?;
+        let workspace = open_workspace(&parent.to_string_lossy())?;
+        let entries = list_workspace_tree(&workspace.path, false)?;
+        let file = read_workspace_file(&workspace.path, &canonical.to_string_lossy())?;
+        let active_path = Some(file.path.clone());
+        Ok(OpenResult {
+            workspace,
+            entries,
+            file: Some(file),
+            active_path,
+        })
+    }
+}
 
 pub fn open_workspace(path: &str) -> NekoResult<WorkspaceSummary> {
     let root = security::normalize_workspace(path)?;
@@ -34,17 +78,17 @@ pub fn open_workspace(path: &str) -> NekoResult<WorkspaceSummary> {
             file_count += 1;
             let relative = security::relative_path(&root, entry.path());
             let kind = detect_document_kind(&relative, None);
-            if matches!(kind, crate::domain::models::DocumentKind::Markdown) {
+            if matches!(kind, DocumentKind::Markdown) {
                 markdown_count += 1;
             }
             if matches!(
                 kind,
-                crate::domain::models::DocumentKind::Json
-                    | crate::domain::models::DocumentKind::Jsonc
-                    | crate::domain::models::DocumentKind::Yaml
-                    | crate::domain::models::DocumentKind::Toml
-                    | crate::domain::models::DocumentKind::Terraform
-                    | crate::domain::models::DocumentKind::Dockerfile
+                DocumentKind::Json
+                    | DocumentKind::Jsonc
+                    | DocumentKind::Yaml
+                    | DocumentKind::Toml
+                    | DocumentKind::Terraform
+                    | DocumentKind::Dockerfile
             ) {
                 config_count += 1;
             }
@@ -99,7 +143,7 @@ pub fn list_workspace_tree(path: &str, include_hidden: bool) -> NekoResult<Vec<F
             path: relative.clone(),
             name,
             kind: if metadata.is_dir() {
-                crate::domain::models::DocumentKind::Text
+                DocumentKind::Text
             } else {
                 detect_document_kind(&relative, None)
             },
@@ -133,12 +177,6 @@ pub fn read_workspace_file(workspace: &str, path: &str) -> NekoResult<FilePayloa
     })
 }
 
-pub fn write_workspace_file(workspace: &str, path: &str, content: &str) -> NekoResult<FilePayload> {
-    let target = security::resolve_writable_in_workspace(workspace, path)?;
-    fs::write(&target, content)?;
-    read_workspace_file(workspace, path)
-}
-
 pub fn watch_workspace(
     app: AppHandle,
     watchers: State<'_, WatcherRegistry>,
@@ -168,10 +206,7 @@ pub fn search_workspace(workspace: &str, query: &str) -> NekoResult<Vec<SearchRe
             continue;
         }
         let relative = security::relative_path(&root, entry.path());
-        if matches!(
-            detect_document_kind(&relative, None),
-            crate::domain::models::DocumentKind::Binary
-        ) {
+        if matches!(detect_document_kind(&relative, None), DocumentKind::Binary) {
             continue;
         }
         let Ok(content) = fs::read_to_string(entry.path()) else {

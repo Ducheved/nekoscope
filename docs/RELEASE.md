@@ -24,3 +24,9 @@ The release workflow installs pnpm, Node LTS, Rust stable and platform-specific 
 ## Platform Notes
 
 Windows produces NSIS/MSI-capable metadata and file associations through Tauri bundle configuration. Linux produces AppImage and deb metadata. macOS builds for Apple Silicon and Intel through the matrix.
+
+Expected artifacts:
+
+- Windows: NSIS setup, MSI installer and `windows-x64-portable.zip`.
+- macOS: DMG plus `.app.tar.gz` bundles.
+- Linux: deb, rpm and AppImage.

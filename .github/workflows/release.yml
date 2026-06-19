@@ -66,3 +66,12 @@ jobs:
           releaseDraft: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY == '' }}
           prerelease: false
           args: ${{ matrix.args }}
+      - name: Package Windows portable app
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $archive = "NekoScope_${{ github.ref_name }}_windows-x64-portable.zip"
+          Compress-Archive -LiteralPath "src-tauri\target\release\nekoscope.exe" -DestinationPath $archive -Force
+          gh release upload "${{ github.ref_name }}" $archive --clobber

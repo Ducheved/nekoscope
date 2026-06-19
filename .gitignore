@@ -14,7 +14,7 @@ dist
 !.env.example
 *.log
 *.tmp
-logo.png
+/logo.png
 .DS_Store
 .nekoscope
 .codex
@@ -28,3 +28,4 @@ logo.png
 .idea
 .vscode
 MEOW.md
+.playwright-mcp

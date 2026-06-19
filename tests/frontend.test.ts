@@ -1,16 +1,12 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { buildProviderRequest } from "../src/lib/neko/aiBridge";
 import {
   demoTree,
   demoWorkspace,
   readDemoFile,
 } from "../src/lib/neko/demoWorkspace";
-import { renderMindmapSvg } from "../src/lib/neko/diagramGarden";
-import { formatDocument } from "../src/lib/neko/formatters";
-import { markdownToMindmap } from "../src/lib/neko/mindmapAdapters";
 import { rankFiles } from "../src/lib/neko/quickSwitcher";
-import { defaultProviderProfile } from "../src/lib/neko/providerProfiles";
-import { defaultSettings, loadSettings } from "../src/lib/neko/settingsStore";
+import { visibleFiles } from "../src/lib/neko/fileTree";
+import { loadSettings } from "../src/lib/neko/settingsStore";
 
 describe("frontend behavior", () => {
   beforeEach(() => {
@@ -35,49 +31,37 @@ describe("frontend behavior", () => {
     });
   });
 
-  it("opens the sample workspace mock", () => {
+  it("ships a readable sample document", () => {
     const first = readDemoFile("README.md");
-    expect(demoWorkspace.name).toBe("neko-repo");
+    expect(demoWorkspace.name).toBe("sample");
     expect(demoTree.length).toBeGreaterThan(0);
-    expect(first.content).toContain("NekoScope Sample");
+    expect(first.kind).toBe("markdown");
+    expect(first.content).toContain("NekoScope");
   });
 
-  it("ranks quick switcher entries", () => {
-    const ranked = rankFiles(demoTree, "metrics", []);
-    expect(ranked[0].path).toBe("ml/metrics.json");
+  it("falls back to the README for unknown sample paths", () => {
+    expect(readDemoFile("does/not/exist.md").path).toBe("README.md");
   });
 
-  it("builds an Ask AI request without plaintext secrets", () => {
-    const request = buildProviderRequest(
-      defaultProviderProfile,
-      "api_key=secret",
-      [{ path: ".env", content: "TOKEN=secret" }],
-    );
-    expect(JSON.stringify(request)).not.toContain("secret");
+  it("ranks quick-switcher entries by file name", () => {
+    const ranked = rankFiles(demoTree, "shortcuts", []);
+    expect(ranked[0].path).toBe("docs/shortcuts.md");
   });
 
-  it("saves and loads settings from local storage", () => {
+  it("filters the file tree by substring", () => {
+    const shown = visibleFiles(demoTree, "tour");
+    expect(shown).toHaveLength(1);
+    expect(shown[0].path).toBe("docs/markdown-tour.md");
+  });
+
+  it("merges stored settings over the defaults", () => {
     window.localStorage.setItem(
       "nekoscope-settings",
       JSON.stringify({ locale: "ru", fontScale: 1.1 }),
     );
-    expect(loadSettings()).toEqual({
-      ...defaultSettings,
-      locale: "ru",
-      fontScale: 1.1,
-    });
-  });
-
-  it("renders mindmap SVG state", () => {
-    const svg = renderMindmapSvg(markdownToMindmap("# A\n## B"));
-    expect(svg).toContain("<svg");
-    expect(svg).toContain("B");
-  });
-
-  it("creates a format diff flow without writing the source", () => {
-    const original = '{"b":2,"a":1}';
-    const formatted = formatDocument("config.json", original);
-    expect(formatted).not.toBe(original);
-    expect(original).toBe('{"b":2,"a":1}');
+    const loaded = loadSettings();
+    expect(loaded.locale).toBe("ru");
+    expect(loaded.fontScale).toBe(1.1);
+    expect(loaded.theme).toBe("system");
   });
 });

@@ -1,7 +1,4 @@
-use crate::domain::{
-    errors::{NekoError, NekoResult},
-    models::{DocumentKind, FormatResult},
-};
+use crate::domain::models::DocumentKind;
 
 pub fn detect_document_kind(path: &str, content: Option<&str>) -> DocumentKind {
     let lower = path.to_ascii_lowercase();
@@ -29,9 +26,23 @@ pub fn detect_document_kind(path: &str, content: Option<&str>) -> DocumentKind {
         DocumentKind::Mindmap
     } else if lower.ends_with(".opml") {
         DocumentKind::Opml
+    } else if is_binary_extension(&lower) {
+        DocumentKind::Binary
     } else {
         DocumentKind::Text
     }
+}
+
+fn is_binary_extension(lower: &str) -> bool {
+    const BINARY: &[&str] = &[
+        ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".webp", ".tif", ".tiff", ".avif", ".pdf",
+        ".zip", ".gz", ".tgz", ".tar", ".7z", ".rar", ".bz2", ".xz", ".zst", ".mp3", ".mp4",
+        ".mov", ".avi", ".mkv", ".webm", ".wav", ".flac", ".ogg", ".m4a", ".woff", ".woff2",
+        ".ttf", ".otf", ".eot", ".exe", ".dll", ".so", ".dylib", ".bin", ".class", ".jar", ".wasm",
+        ".node", ".pdb", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".odt", ".ods", ".odp",
+        ".db", ".sqlite", ".sqlite3", ".pyc",
+    ];
+    BINARY.iter().any(|ext| lower.ends_with(ext))
 }
 
 pub fn looks_like_json(content: Option<&str>) -> bool {
@@ -39,46 +50,4 @@ pub fn looks_like_json(content: Option<&str>) -> bool {
         .map(str::trim_start)
         .map(|value| value.starts_with('{') || value.starts_with('['))
         .unwrap_or(false)
-}
-
-pub fn is_one_line_json(content: &str) -> bool {
-    let trimmed = content.trim();
-    trimmed.len() > 160
-        && !trimmed.contains('\n')
-        && serde_json::from_str::<serde_json::Value>(trimmed).is_ok()
-}
-
-pub fn format_document(path: &str, content: &str) -> NekoResult<FormatResult> {
-    let kind = detect_document_kind(path, Some(content));
-    let formatted = match kind {
-        DocumentKind::Json => {
-            let parsed: serde_json::Value = serde_json::from_str(content)?;
-            format!("{}\n", serde_json::to_string_pretty(&parsed)?)
-        }
-        DocumentKind::Yaml => {
-            let parsed: serde_yaml::Value = serde_yaml::from_str(content)?;
-            serde_yaml::to_string(&parsed)?
-        }
-        DocumentKind::Toml => {
-            let parsed = content
-                .parse::<toml::Value>()
-                .map_err(|error| NekoError::Toml(error.to_string()))?;
-            format!(
-                "{}\n",
-                toml::to_string_pretty(&parsed)
-                    .map_err(|error| NekoError::Toml(error.to_string()))?
-            )
-        }
-        DocumentKind::Markdown | DocumentKind::Text => {
-            let trimmed = content.trim_end();
-            format!("{trimmed}\n")
-        }
-        _ => return Err(NekoError::UnsupportedFormat),
-    };
-    Ok(FormatResult {
-        path: path.to_string(),
-        kind,
-        changed: formatted != content,
-        formatted,
-    })
 }

@@ -13,39 +13,31 @@
     "windows": [
       {
         "title": "NekoScope",
-        "width": 1280,
-        "height": 820,
-        "minWidth": 980,
-        "minHeight": 680
+        "width": 1180,
+        "height": 800,
+        "minWidth": 720,
+        "minHeight": 540,
+        "dragDropEnabled": true
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' asset: data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' http://127.0.0.1:* http://localhost:*"
+      "csp": "default-src 'self'; img-src 'self' asset: data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self'; connect-src 'self' ipc: http://ipc.localhost ws://localhost:* http://localhost:*"
     }
   },
   "bundle": {
     "active": true,
     "targets": "all",
     "publisher": "NekoScope contributors",
-    "category": "DeveloperTool",
-    "shortDescription": "A tiny kawaii knowledge lens for Markdown-heavy repos.",
-    "longDescription": "NekoScope opens Markdown-heavy repositories, renders knowledge documents, diagrams, DevOps files, ML metadata and review comments in a lightweight desktop shell.",
+    "category": "Utility",
+    "shortDescription": "A fast, calm desktop Markdown viewer.",
+    "longDescription": "NekoScope is a lightweight desktop Markdown viewer. Double-click a .md file to read it instantly with GFM, math, Mermaid diagrams, syntax-highlighted code, an outline and a file sidebar.",
     "fileAssociations": [
       {
         "ext": ["md", "markdown", "mdx"],
-        "mimeType": "text/markdown"
-      },
-      {
-        "ext": ["json", "jsonc"],
-        "mimeType": "application/json"
-      },
-      {
-        "ext": ["yaml", "yml"],
-        "mimeType": "application/yaml"
-      },
-      {
-        "ext": ["toml", "tf", "tfvars", "hcl", "mm", "opml"],
-        "mimeType": "text/plain"
+        "name": "Markdown Document",
+        "description": "Markdown Document",
+        "mimeType": "text/markdown",
+        "role": "Viewer"
       }
     ],
     "icon": [
@@ -55,12 +47,5 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
-  },
-  "plugins": {
-    "deep-link": {
-      "desktop": {
-        "schemes": ["nekoscope"]
-      }
-    }
   }
 }

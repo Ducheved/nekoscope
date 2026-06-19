@@ -1,147 +1,102 @@
 <script lang="ts">
   import { X } from "@lucide/svelte";
   import { createEventDispatcher } from "svelte";
-  import { localeOptions } from "$lib/neko/i18n";
-  import { defaultSyncProfile } from "$lib/neko/syncBridge";
-  import { themeModes } from "$lib/neko/themeTokens";
-  import type {
-    AppSettings,
-    LocaleCode,
-    SyncProfile,
-    ThemeMode,
-  } from "$lib/neko/types";
-  import ProviderSettings from "./ProviderSettings.svelte";
+  import { localeOptions, translate } from "$lib/neko/i18n";
+  import type { AppSettings, LocaleCode, ThemeMode } from "$lib/neko/types";
 
   export let settings: AppSettings;
 
   const dispatch = createEventDispatcher<{
     close: void;
     change: AppSettings;
-    saveSync: SyncProfile;
   }>();
-  $: editable = {
-    ...settings,
-    providerProfile: { ...settings.providerProfile },
-  };
-  $: syncProfile = editable.syncProfiles[0] ?? defaultSyncProfile;
+
+  $: t = (key: Parameters<typeof translate>[1]) =>
+    translate(settings.locale, key);
+  $: themeOptions = [
+    { value: "system" as const, label: t("systemTheme") },
+    { value: "light" as const, label: t("lightTheme") },
+    { value: "dark" as const, label: t("darkTheme") },
+  ];
 
   function update(patch: Partial<AppSettings>) {
-    editable = { ...editable, ...patch };
-    dispatch("change", editable);
-  }
-
-  function updateSync(patch: Partial<SyncProfile>) {
-    const next = { ...syncProfile, ...patch };
-    update({
-      syncProfiles: [
-        next,
-        ...editable.syncProfiles.filter((profile) => profile.id !== next.id),
-      ],
-    });
+    dispatch("change", { ...settings, ...patch });
   }
 </script>
 
-<div class="backdrop" role="presentation">
+<div
+  class="backdrop"
+  role="presentation"
+  on:click|self={() => dispatch("close")}
+>
   <div
     class="dialog"
     role="dialog"
-    aria-label="Settings"
+    aria-label={t("settingsTitle")}
     aria-modal="true"
-    tabindex="-1"
   >
     <header>
-      <h2>Settings</h2>
+      <h2>{t("settingsTitle")}</h2>
       <button
+        class="icon"
         type="button"
-        aria-label="Close settings"
+        aria-label={t("closeSettings")}
         on:click={() => dispatch("close")}
       >
-        <X size={17} />
+        <X size={18} />
       </button>
     </header>
 
-    <div class="grid">
-      <section>
-        <h3>Experience</h3>
-        <label>
-          <span>Language</span>
-          <select
-            value={editable.locale}
-            on:change={(event) =>
-              update({ locale: event.currentTarget.value as LocaleCode })}
-          >
-            {#each localeOptions as option}
-              <option value={option.code}>{option.label}</option>
-            {/each}
-          </select>
-        </label>
-        <label>
-          <span>Theme</span>
-          <select
-            value={editable.theme}
-            on:change={(event) =>
-              update({ theme: event.currentTarget.value as ThemeMode })}
-          >
-            {#each themeModes as option}
-              <option value={option.value}>{option.label}</option>
-            {/each}
-          </select>
-        </label>
-        <label>
-          <span>Font scale</span>
+    <section>
+      <h3>{t("appearance")}</h3>
+
+      <label class="field">
+        <span>{t("language")}</span>
+        <select
+          value={settings.locale}
+          on:change={(event) =>
+            update({ locale: event.currentTarget.value as LocaleCode })}
+        >
+          {#each localeOptions as option (option.code)}
+            <option value={option.code}>{option.label}</option>
+          {/each}
+        </select>
+      </label>
+
+      <div class="field">
+        <span>{t("theme")}</span>
+        <div class="segmented" role="group" aria-label={t("theme")}>
+          {#each themeOptions as option (option.value)}
+            <button
+              type="button"
+              class:active={settings.theme === option.value}
+              on:click={() => update({ theme: option.value as ThemeMode })}
+              >{option.label}</button
+            >
+          {/each}
+        </div>
+      </div>
+
+      <div class="field">
+        <span>{t("fontScale")} · {Math.round(settings.fontScale * 100)}%</span>
+        <div class="slider">
           <input
             type="range"
-            min="0.85"
-            max="1.25"
+            min="0.8"
+            max="1.4"
             step="0.05"
-            value={editable.fontScale}
+            value={settings.fontScale}
             on:input={(event) =>
               update({ fontScale: Number(event.currentTarget.value) })}
           />
-        </label>
-      </section>
-
-      <section>
-        <h3>AI provider</h3>
-        <ProviderSettings
-          profile={editable.providerProfile}
-          on:change={(event) => update({ providerProfile: event.detail })}
-        />
-      </section>
-
-      <section>
-        <h3>Sync</h3>
-        <label>
-          <span>Name</span>
-          <input
-            value={syncProfile.name}
-            on:input={(event) =>
-              updateSync({ name: event.currentTarget.value })}
-          />
-        </label>
-        <label>
-          <span>Storage path</span>
-          <input
-            value={syncProfile.rootPath}
-            placeholder="Cloud-mounted folder or network share"
-            on:input={(event) =>
-              updateSync({ rootPath: event.currentTarget.value })}
-          />
-        </label>
-        <label class="checkbox">
-          <input
-            type="checkbox"
-            checked={syncProfile.enabled}
-            on:change={(event) =>
-              updateSync({ enabled: event.currentTarget.checked })}
-          />
-          <span>Enable profile</span>
-        </label>
-        <button type="button" on:click={() => dispatch("saveSync", syncProfile)}
-          >Save sync profile</button
-        >
-      </section>
-    </div>
+          <button
+            type="button"
+            class="reset"
+            on:click={() => update({ fontScale: 1 })}>{t("resetFont")}</button
+          >
+        </div>
+      </div>
+    </section>
   </div>
 </div>
 
@@ -149,91 +104,134 @@
   .backdrop {
     position: fixed;
     inset: 0;
-    z-index: 20;
+    z-index: 30;
     display: grid;
     place-items: center;
-    padding: 22px;
-    background: rgba(24, 32, 38, 0.32);
-    backdrop-filter: blur(16px);
+    padding: 18px;
+    background: rgba(12, 16, 22, 0.4);
+    backdrop-filter: blur(12px);
   }
 
   .dialog {
-    width: min(980px, 100%);
-    max-height: min(760px, 94vh);
-    overflow: auto;
+    width: min(460px, 100%);
+    overflow: hidden;
     border: 1px solid var(--yuki-border);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.82);
-    box-shadow: 0 24px 70px rgba(24, 32, 38, 0.22);
+    border-radius: 14px;
+    background: var(--surface-strong);
+    box-shadow: 0 28px 80px rgba(12, 16, 22, 0.3);
   }
 
   header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 18px;
+    padding: 15px 18px;
     border-bottom: 1px solid var(--yuki-border);
   }
 
-  h2,
-  h3 {
+  h2 {
     margin: 0;
-    letter-spacing: 0;
+    font-size: 17px;
   }
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
-    padding: 18px;
+  h3 {
+    margin: 0 0 4px;
+    color: var(--kumo-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   section {
     display: grid;
-    align-content: start;
-    gap: 11px;
+    gap: 16px;
+    padding: 18px;
   }
 
-  label {
+  .field {
     display: grid;
-    gap: 5px;
-    color: var(--kumo-muted);
-    font-size: 12px;
+    gap: 7px;
   }
 
-  input,
+  .field > span {
+    color: var(--neko-ink);
+    font-size: 13px;
+  }
+
   select {
-    min-width: 0;
     width: 100%;
-    min-height: 34px;
+    min-height: 38px;
+    padding: 0 10px;
     border: 1px solid var(--yuki-border);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.68);
+    border-radius: 10px;
+    background: var(--surface);
     color: var(--neko-ink);
     font: inherit;
   }
 
-  .checkbox {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  .segmented {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid var(--yuki-border);
+    border-radius: 11px;
+    background: var(--control-bg);
   }
 
-  button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 34px;
-    border: 1px solid var(--yuki-border);
+  .segmented button {
+    min-height: 32px;
+    border: 1px solid transparent;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.68);
+    background: transparent;
+    color: var(--neko-ink);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .segmented button.active {
+    border-color: var(--yuki-border);
+    background: var(--surface-strong);
+    box-shadow: var(--soft-shadow);
+  }
+
+  .slider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .slider input {
+    flex: 1;
+    accent-color: var(--mikan-accent);
+  }
+
+  .reset {
+    border: 1px solid var(--yuki-border);
+    border-radius: 9px;
+    padding: 6px 12px;
+    background: var(--control-bg);
+    color: var(--neko-ink);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .reset:hover {
+    background: var(--control-bg-strong);
+  }
+
+  .icon {
+    display: inline-flex;
+    padding: 6px;
+    border: 1px solid var(--yuki-border);
+    border-radius: 9px;
+    background: var(--control-bg);
     color: var(--neko-ink);
     cursor: pointer;
   }
 
-  @media (max-width: 860px) {
-    .grid {
-      grid-template-columns: 1fr;
-    }
+  .icon:hover {
+    background: var(--control-bg-strong);
   }
 </style>
