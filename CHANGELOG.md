@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0
+## 0.1.1
 
 - Tauri 2 + SvelteKit foundation for a fast, calm desktop Markdown viewer.
 - Open a `.md` file straight from the desktop: file association, "Open with",

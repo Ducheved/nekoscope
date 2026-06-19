@@ -1,6 +1,6 @@
 [package]
 name = "nekoscope"
-version = "0.1.0"
+version = "0.1.1"
 description = "A fast, calm desktop Markdown viewer."
 authors = ["NekoScope contributors"]
 license = "MPL-2.0"
